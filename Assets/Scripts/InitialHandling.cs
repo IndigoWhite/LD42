@@ -22,30 +22,44 @@ public class InitialHandling : MonoBehaviour {
 
     public int spacesLeft = 10;
     public int timeLeft = 90;
+    private int selectedVictim;
 
     [Header("Game Over Handling")]
 
     public Image[] gameOverMugs;
     public TextMeshProUGUI[] gameOverNames;
+
+    public Image[] gameOverDeadMugs;
+    public TextMeshProUGUI[] gameOverDeadNames;
+
     public GameObject mainUI;
     public GameObject gameOverUI;
+    public GameObject gameButtonsUI;
 
+    public GameObject timeUpUI;
+    public GameObject zeroSavesUI;
+    public GameObject notEnoughSavesUI;
 
+    private bool gameIsOver;
 
     // Use this for initialization
     void Start () {
+
+        gameIsOver = false;
 
         for (int i = 0; i < victims.Length; i++)
         {
             remainingVictims.Add(victims[i]);
         }
 
+        RandomVictim();
+
         //mugSprite = victims[0].mugShot;
-        mugShot.sprite = victims[0].mugShot;
-        nameText.text = victims[0].victimName;
-        ageText.text = victims[0].age.ToString();
-        familyText.text = victims[0].family;
-        jobText.text = victims[0].job;
+        mugShot.sprite = victims[selectedVictim].mugShot;
+        nameText.text = victims[selectedVictim].victimName;
+        ageText.text = victims[selectedVictim].age.ToString();
+        familyText.text = victims[selectedVictim].family;
+        jobText.text = victims[selectedVictim].job;
 
         spacesLeftText.text = spacesLeft.ToString();
         InvokeRepeating("Timer", 1, 1);
@@ -54,9 +68,13 @@ public class InitialHandling : MonoBehaviour {
 
     public void Timer()
     {
+        if (gameIsOver)
+        {
+            return;
+        }
         if (timeLeft <= 0)
         {
-            GameOver();
+            TimeUpGameOver();
             return;
         }
         else
@@ -68,7 +86,7 @@ public class InitialHandling : MonoBehaviour {
 		
     public void SaveVictim()
     {
-        savedVictims.Add(remainingVictims[0]);
+        savedVictims.Add(remainingVictims[selectedVictim]);
         spacesLeft -= 1;
         spacesLeftText.text = spacesLeft.ToString();
         if (spacesLeft > 0)
@@ -81,34 +99,95 @@ public class InitialHandling : MonoBehaviour {
         }
     }
 
+    public void RandomVictim()
+    {
+        if (remainingVictims.Count <= 0)
+        {
+            if (savedVictims.Count == 0)
+            {
+                ZeroSavesGameOver();
+                return;
+            }
+            else
+            {
+                NotEnoughPickedGameOver();
+                return;
+            }
+        }
+        Random rnd = new Random();
+        selectedVictim = Random.Range(0, remainingVictims.Count-1);
+    }
+
     public void KillVictim()
     {
-        deadVictims.Add(remainingVictims[0]);
+        deadVictims.Add(remainingVictims[selectedVictim]);
         NextVictim();
 
     }
 
     public void NextVictim()
     {
-        remainingVictims.RemoveAt(0);
+        remainingVictims.RemoveAt(selectedVictim);
 
-        mugShot.sprite = remainingVictims[0].mugShot;
-        nameText.text = remainingVictims[0].victimName;
-        ageText.text = remainingVictims[0].age.ToString();
-        familyText.text = remainingVictims[0].family;
-        jobText.text = remainingVictims[0].job;
+        RandomVictim();
+        if (remainingVictims.Count <= 0)
+        {
+            return;
+        }
+        mugShot.sprite = remainingVictims[selectedVictim].mugShot;
+        nameText.text = remainingVictims[selectedVictim].victimName;
+        ageText.text = remainingVictims[selectedVictim].age.ToString();
+        familyText.text = remainingVictims[selectedVictim].family;
+        jobText.text = remainingVictims[selectedVictim].job;
+
+        
     }
 
     public void GameOver()
     {
-        Debug.Log("GAME OVER");
-
+        gameIsOver = true;
         mainUI.SetActive(false);
         gameOverUI.SetActive(true);
+        gameButtonsUI.SetActive(false);
         for (int i = 0; i < savedVictims.Count; i++)
         {
             gameOverMugs[i].sprite = savedVictims[i].mugShot;
             gameOverNames[i].text = savedVictims[i].victimName;
         }
+
+        for (int i = 0; i < remainingVictims.Count; i++)
+        {
+            deadVictims.Add(remainingVictims[i]);
+        }
+
+        for (int i = 0; i < gameOverDeadMugs.Length; i++)
+        {
+            gameOverDeadMugs[i].sprite = deadVictims[i].mugShot;
+           // gameOverDeadNames[i].text = deadVictims[i].victimName;
+        }
+    }
+
+    public void ZeroSavesGameOver()
+    {
+        gameIsOver = true;
+        mainUI.SetActive(false);
+        gameButtonsUI.SetActive(false);
+        zeroSavesUI.SetActive(true);
+    }
+
+    public void TimeUpGameOver()
+    {
+        gameIsOver = true;
+        mainUI.SetActive(false);
+        gameButtonsUI.SetActive(false);
+        timeUpUI.SetActive(true);
+    }
+
+    public void NotEnoughPickedGameOver()
+    {
+        gameIsOver = true;
+        mainUI.SetActive(false);
+        gameButtonsUI.SetActive(false);
+        notEnoughSavesUI.SetActive(true);
     }
 }
