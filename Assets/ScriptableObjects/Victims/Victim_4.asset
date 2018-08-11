@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08019ab9d87072745b98d66df62e9415, type: 3}
+  m_Name: Victim_4
+  m_EditorClassIdentifier: 
+  mugShot: {fileID: 21300000, guid: 72c3c50d3d45e7b408c384143925e21a, type: 3}
+  age: 29
+  victimName: Callum
+  family: Wife, 1 Child
+  job: Chemical Technician
